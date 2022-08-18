@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:context=".activities.AddContactActivity"
+        android:orientation="vertical">
+
+        <androidx.camera.view.PreviewView
+            android:id="@+id/viewFinder"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone"/>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cardView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginStart="@dimen/cv_outer_add_edit_contact_margin_start"
+            android:layout_marginTop="@dimen/cv_outer_add_edit_contact_margin_top"
+            android:layout_marginEnd="@dimen/cv_outer_add_edit_contact_margin_end"
+            android:layout_marginBottom="@dimen/cv_outer_add_edit_contact_margin_bottom"
+            android:elevation="@dimen/cv_outer_add_edit_contact_elevation"
+            app:cardCornerRadius="@dimen/cv_outer_add_edit_contact_card_corner_radius">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:padding="@dimen/ll_in_cv_add_edit_contact_padding">
+
+                <de.hdodenhof.circleimageview.CircleImageView
+                    android:id="@+id/civProfilePic"
+                    android:layout_width="@dimen/civ_add_edit_contact_layout_height"
+                    android:layout_height="@dimen/civ_add_edit_contact_layout_height"
+                    android:contentDescription="@string/civ_add_edit_contact_content_description"
+                    android:src="@drawable/ic_baseline_person_24" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/til_first_name_add_edit_contact_margin_top">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etFName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/first_name_add_edit_contact_hint"
+                        android:textSize="@dimen/acet_add_edit_contact_first_name_text_size"/>
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/til_last_name_add_edit_contact_margin_top">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/etLName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/last_name_add_edit_contact_hint"
+                        android:textSize="@dimen/acet_add_edit_contact_last_name_text_size" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cv_inner_add_edit_contact_margin_top"
+                    android:elevation="5dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:id="@+id/llPhoneNumber"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:background="@color/task_list_action_color"
+                            android:gravity="center_vertical"
+                            android:orientation="vertical"
+                            android:visibility="visible"
+                            tools:visibility="visible">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="@dimen/view_divider_add_edit_contact_layout_height"
+                                android:background="@color/divide_color" />
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/rvPhoneNumberList"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/rv_numbers_add_edit_contact_layout_margin"
+                                tools:itemCount="3" />
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/cvAddPhoneNumber"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_margin="@dimen/cv_phone_number_add_edit_contact_layout_margin"
+                                android:elevation="5dp"
+                                android:visibility="visible"
+                                app:cardCornerRadius="@dimen/cv_phone_number_add_edit_contact_app_corner_radius"
+                                tools:visibility="visible">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center"
+                                    android:orientation="horizontal">
+
+
+                                    <EditText
+                                        android:id="@+id/etNumber"
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:hint="@string/number_add_edit_contact_hint"
+                                        android:inputType="phone" />
+
+                                    <ImageButton
+                                        android:id="@+id/ibDoneNumberInput"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:background="?attr/selectableItemBackground"
+                                        android:contentDescription="@string/confirm_add_edit_contact"
+                                        android:padding="@dimen/ib_save_number_add_edit_contact_padding"
+                                        android:src="@drawable/ic_baseline_check_circle_24" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                        </LinearLayout>
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <androidx.cardview.widget.CardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/cv_inner_add_edit_contact_margin_top"
+                    android:elevation="5dp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                    </LinearLayout>
+
+                </androidx.cardview.widget.CardView>
+
+                <Button
+                    android:id="@+id/btnSaveChanges"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/btn_save_changes_add_edit_contact_margin_top"
+                    android:text="@string/save_changes_add_edit_contact_text" />
+
+            </LinearLayout>
+
+        </androidx.cardview.widget.CardView>
+
+    </LinearLayout>
+</ScrollView>

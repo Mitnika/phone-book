@@ -1,0 +1,161 @@
+CREATE TABLE CONTACT (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    firstName TEXT NOT NULL,
+    lastName TEXT NOT NULL,
+    picture TEXT NOT NULL,
+    externalId TEXT,
+    state TEXT CHECK (state = 'EDITABLE' OR state = 'UNEDITABLE' OR state = 'DELETED') NOT NULL
+);
+
+CREATE TABLE PHONE_NUMBERS (
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    number TEXT NOT NULL,
+    contactId INTEGER NOT NULL,
+    externalId TEXT,
+    state TEXT CHECK (state = 'EDITABLE' OR state = 'UNEDITABLE' OR state = 'DELETED') NOT NULL,
+    FOREIGN KEY (contactId) REFERENCES CONTACT(id) ON DELETE CASCADE
+);
+
+CREATE INDEX CONTACT_EXT_ID_IND
+ON CONTACT (externalId);
+
+CREATE INDEX PHONE_EXT_ID_IND
+ON PHONE_NUMBERS (externalId);
+
+-- Get the last id of an inserted row
+lastIndexRowId:
+SELECT last_insert_rowid();
+
+-- This query is for display purposes of the people
+retrieveAllContactsForDisplay:
+SELECT id, firstName, lastName, picture, externalId, state
+FROM CONTACT
+WHERE state NOT LIKE 'DELETED'
+ORDER BY LOWER(firstName||lastName) ASC;
+
+retrieveAllContactsForDisplayByListOfId:
+SELECT id, firstName, lastName, picture, externalId, state
+FROM CONTACT
+WHERE state NOT LIKE 'DELETED' AND id IN ?
+ORDER BY LOWER(firstName||lastName) ASC;
+
+-- This is for the purposes of displaying the available numbers for a user
+retrieveAllTelephoneNumbersAvailableForAUser:
+SELECT id, number, state, contactId, externalId
+FROM PHONE_NUMBERS
+WHERE contactId = ? AND state NOT LIKE 'DELETED';
+
+-- This is for the purpose of displaying a contact in edit view / overview
+retrieveAContactById:
+SELECT id, firstName, lastName, picture, externalId, state
+FROM CONTACT
+WHERE id = ?;
+
+-- Get a phone number by id
+retrieveAPhoneById:
+SELECT id, number, state, contactId, externalId
+FROM PHONE_NUMBERS
+WHERE id = ?;
+
+-- This is for the purpose to check if a contact exists or not
+retrieveAnImportedContactByExtrenalId:
+SELECT id, firstName, lastName, picture, externalId, state
+FROM CONTACT
+WHERE externalId = ?;
+
+-- This is for the purpose to check whether a phone number is already in the database or not
+retrieveAPhoneNumberByExternalId:
+SELECT id, number, state, contactId, externalId
+FROM PHONE_NUMBERS
+WHERE externalId = ?;
+
+-- Search Phone Numbers by text
+searchForText:
+SELECT DISTINCT contactId
+FROM PHONE_NUMBERS
+WHERE number LIKE ('%' || :text)
+OR    number LIKE (:text || '%')
+UNION
+SELECT id
+FROM CONTACT
+WHERE (firstName||' '||lastName) LIKE ('%'||:text||'%');
+
+-- This for the purpose to insert a contact
+insertContact:
+INSERT INTO CONTACT(firstName, lastName, picture, externalId, state)
+VALUES (?, ?, ?, ?, ?);
+
+-- This inserts a telephone in the database
+insertPhone:
+INSERT INTO PHONE_NUMBERS(number, contactId, externalId, state)
+VALUES (?, ?, ?, ?);
+
+-- Mark a contact as deleted so that it is no longer displayed
+markAsDeletedAContact:
+UPDATE CONTACT
+SET state = 'DELETED'
+WHERE id = ?;
+
+-- Mark a phone number as deleted so that it is no longer deleted
+markAsDeletedAPhoneNumber:
+UPDATE PHONE_NUMBERS
+SET state = 'DELETED'
+WHERE id = ?;
+
+markAsDeletedPhoneNumbersOfAContact:
+UPDATE PHONE_NUMBERS
+SET state = 'DELETED'
+WHERE contactId = ?;
+
+-- Updates the firstName of a contact
+updateFirstNameOfAContact:
+UPDATE CONTACT
+SET firstName = ?, state = ?
+WHERE id = ?;
+
+-- Updates the last name of a contact
+updateLastNameOfAContact:
+UPDATE CONTACT
+SET lastName = ?, state = ?
+WHERE id = ?;
+
+-- Update the picture of a contact
+updatePictureOfAContact:
+UPDATE CONTACT
+SET picture = ?, state = ?
+WHERE id = ?;
+
+-- Update a phone number
+updatePhoneNumber:
+UPDATE PHONE_NUMBERS
+SET number = ?, state = ?
+WHERE id = ?;
+
+-- Delete all that have expected a change but have received none
+deleteContactsWhichWereDeletedFromTheDevice:
+DELETE FROM CONTACT
+WHERE externalId NOT NULL
+AND   state LIKE 'EDITABLE'
+AND   externalId NOT IN ?;
+
+-- Delete all phone numbers that have been deleted from the device
+deletePhoneNumbersWhichWereDeletedFromDevice:
+DELETE FROM PHONE_NUMBERS
+WHERE externalId NOT NULL
+AND   state LIKE 'EDITABLE'
+AND   externalId NOT IN ?;
+
+-- Delete completely from the database a phone number
+deletePhoneFromTheDatabase:
+DELETE FROM PHONE_NUMBERS
+WHERE id = ?;
+
+-- Delete a contact completely from the database
+deleteContactFromTheDatabase:
+DELETE FROM CONTACT
+WHERE id = ?;
+
+-- Delete phone numbers of a contact
+deletePhoneNumbersOfAContact:
+DELETE FROM PHONE_NUMBERS
+WHERE contactId = ?;

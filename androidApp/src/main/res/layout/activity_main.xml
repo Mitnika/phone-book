@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical">
+
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarMain"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:popupTheme="@style/AppTheme.PopupOverlay">
+
+            <ImageButton
+                android:id="@+id/addContact"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/ib_add_contact_main"
+                android:layout_gravity="end"
+                android:contentDescription="@string/toolbar_add_icon_content_description_main"
+                android:background="@drawable/ic_baseline_add_24" />
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.appcompat.widget.SearchView
+        android:id="@+id/searchViewContact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:queryHint="@string/query_hint"
+        app:iconifiedByDefault="false"/>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAllContacts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/rv_main_padding"
+        android:scrollbarSize="@dimen/main_scroll_bar_size"
+        tools:context=".activities.MainActivity"
+        />
+    <TextView
+        android:id="@+id/permissionNotGranted"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:textSize="20sp"
+        android:text="NO PERMISSION"
+        android:gravity="center"
+        android:visibility="gone"
+        />
+</LinearLayout>
+

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <dimen name="rv_main_padding">16sp</dimen>
+    <dimen name="main_scroll_bar_size">25sp</dimen>
+    <dimen name="ll_margin_bottom_contact_item">10dp</dimen>
+    <dimen name="ll_item_contact_padding">10dp</dimen>
+    <dimen name="civ_layout_width_contact_item">60dp</dimen>
+    <dimen name="civ_layout_height_contact_item">60dp</dimen>
+    <dimen name="civ_border_width_contact_item">0.5dp</dimen>
+    <dimen name="ll_margin_start_item_contact">10dp</dimen>
+    <dimen name="tv_text_size_item_contact">18sp</dimen>
+    <dimen name="view_padding_layout_height_item_contact">0.3dp</dimen>
+    <dimen name="view_padding_layout_margin_top_item_contact">5dp</dimen>
+    <dimen name="iv_margin_end_contact_item">10dp</dimen>
+    <dimen name="ib_add_contact_main">20dp</dimen>
+
+    <dimen name="cl_padding_progress_dialog">10dp</dimen>
+    <dimen name="pb_layout_width_progress_dialog">50dp</dimen>
+    <dimen name="pb_layout_height_progress_dialog">50dp</dimen>
+    <dimen name="tv_layout_margin_start_progress_dialog">16dp</dimen>
+    <dimen name="tv_text_size_progress_dialog">16sp</dimen>
+
+    <dimen name="cv_outer_add_edit_contact_margin_start">16dp</dimen>
+    <dimen name="cv_outer_add_edit_contact_margin_end">16dp</dimen>
+    <dimen name="cv_outer_add_edit_contact_margin_top">10dp</dimen>
+    <dimen name="cv_outer_add_edit_contact_margin_bottom">10dp</dimen>
+    <dimen name="cv_outer_add_edit_contact_elevation">10dp</dimen>
+    <dimen name="cv_outer_add_edit_contact_card_corner_radius">10dp</dimen>
+    <dimen name="ll_in_cv_add_edit_contact_padding">16dp</dimen>
+    <dimen name="civ_add_edit_contact_layout_width">100dp</dimen>
+    <dimen name="civ_add_edit_contact_layout_height">100dp</dimen>
+    <dimen name="til_first_name_add_edit_contact_margin_top">15dp</dimen>
+    <dimen name="acet_add_edit_contact_first_name_text_size">16sp</dimen>
+    <dimen name="til_last_name_add_edit_contact_margin_top">15dp</dimen>
+    <dimen name="acet_add_edit_contact_last_name_text_size">16sp</dimen>
+    <dimen name="cv_inner_add_edit_contact_margin_top">15dp</dimen>
+    <dimen name="view_divider_add_edit_contact_layout_height">0.5dp</dimen>
+    <dimen name="rv_numbers_add_edit_contact_layout_margin">5dp</dimen>
+    <dimen name="cv_phone_number_add_edit_contact_layout_margin">5dp</dimen>
+    <dimen name="cv_phone_number_add_edit_contact_app_corner_radius">5dp</dimen>
+    <dimen name="ib_save_number_add_edit_contact_padding">10dp</dimen>
+    <dimen name="btn_save_changes_add_edit_contact_margin_top">15dp</dimen>
+
+    <dimen name="civ_layout_width_phone_item">30dp</dimen>
+    <dimen name="civ_layout_height_phone_item">30dp</dimen>
+
+</resources>

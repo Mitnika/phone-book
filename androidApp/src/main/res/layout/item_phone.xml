@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llAll"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/ll_margin_bottom_contact_item"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/ll_item_contact_padding">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:layout_width="@dimen/civ_layout_width_phone_item"
+            android:layout_height="@dimen/civ_layout_height_phone_item"
+            android:contentDescription="@string/civ_content_description_item_contact"
+            android:src="@drawable/ic_baseline_phone_24"
+            app:civ_border_color="@color/primary_text_color"
+            app:civ_border_width="@dimen/civ_border_width_contact_item" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/ll_margin_start_item_contact"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+
+                <EditText
+                    android:id="@+id/etPhoneNumber"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:hint="@string/number_add_edit_contact_hint"
+                    android:inputType="phone" />
+
+                <ImageButton
+                    android:id="@+id/ibDoneEditing"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="@string/confirm_add_edit_contact"
+                    android:padding="@dimen/ib_save_number_add_edit_contact_padding"
+                    android:src="@drawable/ic_baseline_edit_24" />
+
+                <ImageButton
+                    android:id="@+id/ibDelete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/selectableItemBackground"
+                    android:contentDescription="@string/confirm_add_edit_contact"
+                    android:padding="@dimen/ib_save_number_add_edit_contact_padding"
+                    android:src="@drawable/ic_baseline_delete_24" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_padding_layout_height_item_contact"
+        android:layout_marginTop="@dimen/view_padding_layout_margin_top_item_contact"
+        android:background="@color/divide_color" />
+</LinearLayout>

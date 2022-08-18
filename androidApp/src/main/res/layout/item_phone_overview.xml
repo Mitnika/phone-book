@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/llContact"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/ll_margin_bottom_contact_item"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="@dimen/ll_item_contact_padding">
+
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/ivContactImage"
+            android:layout_width="@dimen/civ_layout_width_phone_item"
+            android:layout_height="@dimen/civ_layout_height_phone_item"
+            android:contentDescription="@string/civ_content_description_item_contact"
+            android:src="@drawable/ic_baseline_phone_24"
+            app:civ_border_color="@color/primary_text_color"
+            app:civ_border_width="@dimen/civ_border_width_contact_item" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/ll_margin_start_item_contact"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textColor="@color/primary_text_color"
+                android:textSize="@dimen/tv_text_size_item_contact"
+                tools:text="Phone Number" />
+
+        </LinearLayout>
+
+<!--        <ImageView-->
+<!--            android:id="@+id/iv_selected_member"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_vertical|end"-->
+<!--            android:layout_marginEnd="@dimen/iv_margin_end_contact_item"-->
+<!--            android:contentDescription="@string/civ_content_description_item_contact"-->
+<!--            android:src="@drawable/ic_baseline_info_24"-->
+<!--            android:visibility="gone"-->
+<!--            tools:visibility="visible" />-->
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/view_padding_layout_height_item_contact"
+        android:layout_marginTop="@dimen/view_padding_layout_margin_top_item_contact"
+        android:background="@color/divide_color" />
+</LinearLayout>

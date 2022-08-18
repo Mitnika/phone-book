@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">PhoneBook</string>
+    <string name="query_hint">Search Contact</string>
+    <string name="civ_content_description_item_contact">image</string>
+    <string name="name_person">%1$s</string>
+    <string name="tv_text_progress_dialog">Please Wait...</string>
+    <string name="toolbar_add_icon_content_description_main">Add</string>
+    <string name="civ_add_edit_contact_content_description">image</string>
+    <string name="first_name_add_edit_contact_hint">First Name</string>
+    <string name="last_name_add_edit_contact_hint">Last Name</string>
+    <string name="number_add_edit_contact_hint">Number</string>
+    <string name="confirm_add_edit_contact">Confirm</string>
+    <string name="save_changes_add_edit_contact_text">Save Changes</string>
+    <string name="activity_overview_edit_content_description">Edit</string>
+
+</resources>
