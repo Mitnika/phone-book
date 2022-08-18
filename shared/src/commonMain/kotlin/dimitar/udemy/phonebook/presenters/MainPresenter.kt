@@ -1,5 +1,6 @@
 package dimitar.udemy.phonebook.presenters
 
+import dimitar.udemy.phonebook.database.cache.Database
 import dimitar.udemy.phonebook.database.cache.DatabaseDriverFactory
 import dimitar.udemy.phonebook.database.cache.DatabaseProvider
 import dimitar.udemy.phonebook.database.dao.ContactsDao
@@ -13,11 +14,11 @@ import kotlinx.coroutines.withContext
 
 class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDriverFactory) {
 
-    private var contacts: List<ProfileModel>? = null
-    private val database = DatabaseProvider.initializeDatabase(databaseDriverFactory)
-    private val phoneNumbersDao = PhoneNumbersDao()
-    private val contactsDao = ContactsDao()
-    private var entirely = true
+    private var contacts        : List<ProfileModel>?   = null
+    private val database        : Database              = DatabaseProvider.initializeDatabase(databaseDriverFactory)
+    private val phoneNumbersDao : PhoneNumbersDao       = PhoneNumbersDao()
+    private val contactsDao     : ContactsDao           = ContactsDao()
+    private var entirely        : Boolean               = true
 
 
     fun synchronizeDatabases(contacts: List<ExternalContactModel>) {
@@ -83,13 +84,13 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
     private fun mapToMainVisualModel(contact: ProfileModel) : MainContactVisualization {
         val fName = contact.contactModel.baseModel.firstName
         val lName = contact.contactModel.baseModel.lastName
-        val displayName = if(fName.isEmpty()
-            && lName.isEmpty()) contact.phones[0].baseModel.number
-            else "$fName $lName"
+
+        val displayName =   if(fName.isEmpty() && lName.isEmpty()) contact.phones[0].baseModel.number
+                            else                                   "$fName $lName"
         return MainContactVisualization(
-            contact.contactModel.id,
-            displayName,
-            contact.contactModel.baseModel.picture
+            id          = contact.contactModel.id,
+            displayName = displayName,
+            picture     = contact.contactModel.baseModel.picture
         )
     }
 

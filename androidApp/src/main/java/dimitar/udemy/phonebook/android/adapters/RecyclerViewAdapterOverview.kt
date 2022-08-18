@@ -10,12 +10,12 @@ import dimitar.udemy.phonebook.android.databinding.ItemPhoneOverviewBinding
 import dimitar.udemy.phonebook.models.data.PhoneModel
 
 class RecyclerViewAdapterOverview(
-    private val list: List<PhoneModel>,
-    private val context: Context
+    private val list        : List<PhoneModel>,
+    private val context     : Context
 ) : RecyclerView.Adapter<RecyclerViewAdapterOverview.MyViewHolder>(){
     class MyViewHolder(binding: ItemPhoneOverviewBinding) : RecyclerView.ViewHolder(binding.root) {
-        val tvPhone = binding.tvPhone
-        val llContact = binding.llContact
+        val tvPhone     = binding.tvPhone
+        val llContact   = binding.llContact
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -30,6 +30,7 @@ class RecyclerViewAdapterOverview(
         val model = list[position]
 
         holder.tvPhone.text = model.baseModel.number
+
         holder.llContact.setOnClickListener {
             context.startActivity(Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", model.baseModel.number, null)))
         }

@@ -7,12 +7,12 @@ import dimitar.udemy.phonebook.models.data.ExternalContactModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
 
 class ContactManager(
-    private val contactsDao: ContactsDao,
-    private val phoneNumbersDao: PhoneNumbersDao
+    private val contactsDao     : ContactsDao,
+    private val phoneNumbersDao : PhoneNumbersDao
 ) {
     fun syncContacts(contacts: List<ExternalContactModel>) {
-        val phoneList: ArrayList<String> = ArrayList()
-        val contactList: ArrayList<String> = ArrayList()
+        val phoneList   : ArrayList<String> = ArrayList()
+        val contactList : ArrayList<String> = ArrayList()
 
         contacts.forEach { externalContactModel ->
             contactList.add(externalContactModel.baseContact.externalId!!)

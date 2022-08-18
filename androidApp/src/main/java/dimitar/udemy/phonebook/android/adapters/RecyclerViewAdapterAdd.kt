@@ -15,15 +15,15 @@ class RecyclerViewAdapterAdd(
     companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<BasePhoneModel>() {
             override fun areItemsTheSame(
-                oldItem: BasePhoneModel,
-                newItem: BasePhoneModel
+                oldItem : BasePhoneModel,
+                newItem : BasePhoneModel
             ): Boolean {
                 return oldItem == newItem
             }
 
             override fun areContentsTheSame(
-                oldItem: BasePhoneModel,
-                newItem: BasePhoneModel
+                oldItem : BasePhoneModel,
+                newItem : BasePhoneModel
             ): Boolean {
                 return oldItem.number == newItem.number
             }
@@ -32,9 +32,9 @@ class RecyclerViewAdapterAdd(
     }
 
     class MyViewHolder(binding: ItemPhoneBinding) : RecyclerView.ViewHolder(binding.root) {
-        val etPhoneNumber = binding.etPhoneNumber
-        val ibEdit = binding.ibDoneEditing
-        val ibDelete = binding.ibDelete
+        val etPhoneNumber   = binding.etPhoneNumber
+        val ibEdit          = binding.ibDoneEditing
+        val ibDelete        = binding.ibDelete
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {

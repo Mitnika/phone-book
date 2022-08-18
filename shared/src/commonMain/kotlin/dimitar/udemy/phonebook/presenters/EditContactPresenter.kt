@@ -10,11 +10,19 @@ import dimitar.udemy.phonebook.models.data.ProfileModel
 
 class EditContactPresenter(private val view: View) {
 
-    private val contactsDao = ContactsDao()
-    private val phoneNumbersDao = PhoneNumbersDao()
-    private val contactManager = ContactManager(contactsDao, phoneNumbersDao)
-    private var picture: String? = null
-    private var contact: ProfileModel? = null
+    private val contactsDao     : ContactsDao       = ContactsDao()
+    private val phoneNumbersDao : PhoneNumbersDao   = PhoneNumbersDao()
+    private val contactManager  : ContactManager    = ContactManager(contactsDao, phoneNumbersDao)
+    private var picture         : String?           = null
+    private var contact         : ProfileModel?     = null
+
+    fun getId()             : Long      = contact!!.contactModel.id
+
+    fun getState()          : String    = contact!!.contactModel.state
+
+    fun getPicture()        : String    = picture ?: contact?.contactModel?.baseModel?.picture ?: ""
+
+    fun getExternalId()     : String?   = contact!!.contactModel.baseModel.externalId
 
     fun subscribe() {
         view.getIdExtra()
@@ -38,15 +46,15 @@ class EditContactPresenter(private val view: View) {
     }
 
     private fun validateContact(contact: ProfileModel): InvalidType? {
-        if (contact.contactModel.baseModel.firstName.isEmpty()) {
+        if (contact.contactModel.baseModel.firstName.isEmpty())
             return InvalidType.EMPTY_FIRST_NAME
-        }
-        if (contact.contactModel.baseModel.lastName.isEmpty()) {
+
+        if (contact.contactModel.baseModel.lastName.isEmpty())
             return InvalidType.EMPTY_LAST_NAME
-        }
-        if (contact.phones.isEmpty()) {
+
+        if (contact.phones.isEmpty())
             return InvalidType.NO_PHONE_NUMBERS
-        }
+
         contact.phones.forEach {
             val res = validatePhoneNumber(it)
             if (res != null) return@validateContact res
@@ -55,17 +63,20 @@ class EditContactPresenter(private val view: View) {
     }
 
     private fun validatePhoneNumber(phoneNumber: PhoneModel): InvalidType? {
-        if (phoneNumber.state == StateConstants.STATE_DELETED) return null
-        if (phoneNumber.baseModel.number.isEmpty()) return InvalidType.EMPTY_PHONE_NUMBER
-        val invalidSymbols = arrayListOf('(', ')', '#', ' ', '-')
-        val wholePhoneNum = phoneNumber.baseModel.number.filter { !invalidSymbols.contains(it) }
-        val regex = Regex("\\+?([0-9])*")
-        if (!regex.matches(wholePhoneNum)) return InvalidType.ILLEGAL_SYMBOLS_IN_PHONE_NUMBER
+        if (phoneNumber.state == StateConstants.STATE_DELETED)  return null
+        if (phoneNumber.baseModel.number.isEmpty())             return InvalidType.EMPTY_PHONE_NUMBER
+
+        val invalidSymbols  = arrayListOf('(', ')', '#', ' ', '-')
+        val wholePhoneNum   = phoneNumber.baseModel.number.filter { !invalidSymbols.contains(it) }
+        val regex           = Regex("\\+?([0-9])*")
+
+        if (!regex.matches(wholePhoneNum))                      return InvalidType.ILLEGAL_SYMBOLS_IN_PHONE_NUMBER
         return null
     }
 
     fun onEditClicked(profile: ProfileModel) {
         val error = validateContact(profile)
+
         if (error != null) {
             view.onInvalidField(error)
             throw IllegalArgumentException(error.errorMessage)
@@ -74,14 +85,6 @@ class EditContactPresenter(private val view: View) {
         }
 
     }
-
-    fun getId(): Long = contact!!.contactModel.id
-
-    fun getState(): String = contact!!.contactModel.state
-
-    fun getPicture() = picture ?: ""
-
-    fun getExternalId(): String? = contact!!.contactModel.baseModel.externalId
 
     fun changeOfImage() {
         view.openDialogToChooseOptionForImage()

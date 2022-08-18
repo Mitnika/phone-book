@@ -15,9 +15,9 @@ import dimitar.udemy.phonebook.presenters.OverviewContactPresenter
 
 class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.View {
 
-    private var binding: ActivityOverviewContactBinding? = null
-    private var itemAdapter: RecyclerViewAdapterOverview? = null
-    private val presenter: OverviewContactPresenter = OverviewContactPresenter(this)
+    private var binding     : ActivityOverviewContactBinding?   = null
+    private var itemAdapter : RecyclerViewAdapterOverview?      = null
+    private val presenter   : OverviewContactPresenter          = OverviewContactPresenter(this)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +58,7 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
                 .placeholder(R.drawable.ic_baseline_person_24)
                 .into(binding?.civProfilePic!!)
         }
+
         binding?.tvFName?.text = contact.contactModel.baseModel.firstName
         binding?.tvLName?.text = contact.contactModel.baseModel.lastName
 
@@ -80,7 +81,7 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
     override fun onSuccessfulRetrievalOfInformation() {
         Toast.makeText(
             this,
-            "Information for contact retrieved",
+            resources.getString(R.string.on_success_information),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -88,21 +89,19 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
     override fun onFailedRetrievalOfInformation() {
         Toast.makeText(
             this,
-            "There was an error with retrieving information",
+            resources.getString(R.string.on_failed_retrieval),
             Toast.LENGTH_LONG
         ).show()
     }
 
     override fun getIdExtra(): Long {
-        return if (intent.hasExtra(MainActivity.ID_EXTRA)) {
-            intent.getLongExtra(MainActivity.ID_EXTRA, -1)
-        } else -1
+        return intent.getLongExtra(MainActivity.ID_EXTRA, -1)
     }
 
     override fun onSuccessfulDelete() {
         Toast.makeText(
             applicationContext,
-            "Contact successfully deleted",
+            resources.getString(R.string.successful_deletion),
             Toast.LENGTH_SHORT
         ).show()
         onBackPressed()
@@ -111,7 +110,7 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
     override fun onFailedDelete() {
         Toast.makeText(
             this,
-            "Failed deletion",
+            resources.getString(R.string.failed_deletion),
             Toast.LENGTH_LONG
         ).show()
     }

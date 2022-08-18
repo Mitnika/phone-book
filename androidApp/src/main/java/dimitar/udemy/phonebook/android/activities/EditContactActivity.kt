@@ -35,14 +35,14 @@ import kotlin.collections.ArrayList
 
 class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
 
-    private var binding: ActivityAddEditContactBinding? = null
-    private var presenter: EditContactPresenter = EditContactPresenter(this)
-    private var itemAdapter: RecyclerViewAdapterEdit? = null
-    private val scope = MainScope()
+    private var binding         : ActivityAddEditContactBinding?    = null
+    private var presenter       : EditContactPresenter              = EditContactPresenter(this)
+    private var itemAdapter     : RecyclerViewAdapterEdit?          = null
+    private val scope                                               = MainScope()
 
-    private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
+    private var             imageCapture    : ImageCapture? = null
+    private lateinit var    outputDirectory : File
+    private lateinit var    cameraExecutor  : ExecutorService
 
 
     private val selectImageFromGalleryResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
@@ -60,7 +60,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         startCamera()
 
         outputDirectory = getOutputDirectory()
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        cameraExecutor  = Executors.newSingleThreadExecutor()
 
         binding?.civProfilePic?.setOnClickListener {
             presenter.changeOfImage()
@@ -115,23 +115,23 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         val mediaDir = externalMediaDirs.firstOrNull()?.let {
             File(it, resources.getString(R.string.app_name)).apply { mkdirs() }
         }
-        return  if (mediaDir != null && mediaDir.exists()) mediaDir
-        else filesDir
+        return  if (mediaDir != null && mediaDir.exists())  mediaDir
+                else                                        filesDir
     }
 
     private fun onSavePressed() {
         val contact = ProfileModel(
-            ContactModel(
-                presenter.getId(),
-                BaseContactModel(
-                    binding!!.etFName.text.toString(),
-                    binding!!.etLName.text.toString(),
-                    presenter.getPicture(),
-                    presenter.getExternalId()
+            contactModel = ContactModel(
+                id          = presenter.getId(),
+                baseModel   = BaseContactModel(
+                    firstName   = binding!!.etFName.text.toString(),
+                    lastName    = binding!!.etLName.text.toString(),
+                    picture     = presenter.getPicture(),
+                    externalId  = presenter.getExternalId()
                 ),
-                presenter.getState()
+                state       = presenter.getState()
             ),
-            itemAdapter!!.getPhoneNumbers()
+            phones      = itemAdapter!!.getPhoneNumbers()
         )
         scope.launch {
             kotlin.runCatching {
@@ -172,7 +172,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     override fun onSuccessfulRetrievalOfInformation() {
         Toast.makeText(
             this,
-            "Information retrieved successfully",
+            resources.getString(R.string.on_success_information),
             Toast.LENGTH_SHORT
         ).show()
     }
@@ -180,7 +180,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     override fun onFailedRetrievalOfInformation() {
         Toast.makeText(
             this,
-            "There was something wrong with the retrieval of information",
+            resources.getString(R.string.on_failed_retrieval),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -188,7 +188,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     override fun onEditSuccess() {
         Toast.makeText(
             applicationContext,
-            "Contact edited successfully",
+            resources.getString(R.string.edit_success),
             Toast.LENGTH_SHORT
         ).show()
         onBackPressed()
@@ -197,7 +197,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     override fun onEditFailure() {
         Toast.makeText(
             this,
-            "There was something wrong with the save",
+            resources.getString(R.string.edit_failure),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -214,6 +214,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         if (contact.contactModel.baseModel.picture.isNotEmpty()) {
             binding?.civProfilePic?.setImageURI(Uri.parse(contact.contactModel.baseModel.picture))
         }
+
         binding?.etFName?.setText(contact.contactModel.baseModel.firstName)
         binding?.etLName?.setText(contact.contactModel.baseModel.lastName)
 
@@ -224,6 +225,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         )
 
         itemAdapter = RecyclerViewAdapterEdit(ArrayList(contact.phones))
+
         binding?.rvPhoneNumberList?.adapter = itemAdapter
 
         itemAdapter!!.visualize()
@@ -231,10 +233,10 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
 
     override fun openDialogToChooseOptionForImage() {
         val picDialog = AlertDialog.Builder(this)
-        picDialog.setTitle("Select Action")
+        picDialog.setTitle(resources.getString(R.string.select_action))
         val pictureDialogOptions = arrayOf(
-            "Select photo from library",
-            "Capture photo from camera"
+            resources.getString(R.string.library_choice),
+            resources.getString(R.string.camera_choice)
         )
 
         picDialog.setItems(pictureDialogOptions) {
@@ -253,8 +255,9 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     }
 
     private fun goToCamera() {
-        binding?.viewFinder?.visibility = View.VISIBLE
-        binding?.cardView?.visibility = View.GONE
+        binding?.viewFinder?.visibility     = View.VISIBLE
+        binding?.cardView?.visibility       = View.GONE
+
         binding?.viewFinder?.setOnClickListener {
             takePhotoFromCamera()
         }
@@ -279,28 +282,31 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         imageCapture.takePicture(
             outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
-                    Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
+                    Log.e(TAG, resources.getString(R.string.msg_image_save, exc.message), exc)
                     binding?.viewFinder?.visibility = View.GONE
                     binding?.cardView?.visibility = View.VISIBLE
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
+                    val savedUri    = Uri.fromFile(photoFile)
+                    val msg         = resources.getString(R.string.successful_capture, savedUri)
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
                     Log.d(TAG, msg)
+
                     presenter.onSuccessfulLoadOfPicture(savedUri.toString())
                     binding?.civProfilePic?.setImageURI(savedUri)
+
                     binding?.viewFinder?.visibility = View.GONE
-                    binding?.cardView?.visibility = View.VISIBLE
+                    binding?.cardView?.visibility   = View.VISIBLE
                 }
             })
     }
 
 
     companion object {
-        private const val TAG = "PhonebookApp"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val TAG               = "PhonebookApp"
+        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
 }

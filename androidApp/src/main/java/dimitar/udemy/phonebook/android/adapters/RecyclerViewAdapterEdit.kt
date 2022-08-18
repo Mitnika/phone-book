@@ -29,9 +29,9 @@ class RecyclerViewAdapterEdit(
     }
 
     class MyViewHolder(binding: ItemPhoneBinding) : RecyclerView.ViewHolder(binding.root) {
-        val etPhoneNumber = binding.etPhoneNumber
-        val ibEdit = binding.ibDoneEditing
-        val ibDelete = binding.ibDelete
+        val etPhoneNumber   = binding.etPhoneNumber
+        val ibEdit          = binding.ibDoneEditing
+        val ibDelete        = binding.ibDelete
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
@@ -59,31 +59,36 @@ class RecyclerViewAdapterEdit(
     }
 
     private fun delete(model: PhoneModel) {
-        val index = list.indexOf(model)
-        val indexAll = allPhones.indexOf(model)
+        val index       = list.indexOf(model)
+        val indexAll    = allPhones.indexOf(model)
+
         allPhones[indexAll] = PhoneModel(
-            model.id,
-            model.baseModel,
-            StateConstants.STATE_DELETED
+            id          = model.id,
+            baseModel   = model.baseModel,
+            state       = StateConstants.STATE_DELETED
         )
+
         list.removeAt(index)
         submitList(list)
         notifyItemRemoved(index)
     }
 
     private fun edit(model: PhoneModel, newNum: String) {
-        val position = list.indexOf(model)
-        val positionAll = allPhones.indexOf(model)
+        val position        = list.indexOf(model)
+        val positionAll     = allPhones.indexOf(model)
+
         val updatedModel = PhoneModel(
-            model.id,
-            BasePhoneModel(
-                newNum,
-                model.baseModel.externalId
+            id          = model.id,
+            baseModel   = BasePhoneModel(
+                number      = newNum,
+                externalId  = model.baseModel.externalId
             ),
-            model.state
+            state       = model.state
         )
-        list[position] = updatedModel
-        allPhones[positionAll] = updatedModel
+
+        list[position]          = updatedModel
+        allPhones[positionAll]  = updatedModel
+
         submitList(list)
         notifyItemChanged(position)
     }
@@ -95,10 +100,11 @@ class RecyclerViewAdapterEdit(
 
     fun addAPhoneNumber(newPhoneNumber: BasePhoneModel) {
         val newModel = PhoneModel(
-            -1,
-            newPhoneNumber,
-            StateConstants.STATE_UNEDITABLE
+            id          = -1,
+            baseModel   = newPhoneNumber,
+            state       = StateConstants.STATE_UNEDITABLE
         )
+
         list.add(newModel)
         allPhones.add(newModel)
         submitList(list)

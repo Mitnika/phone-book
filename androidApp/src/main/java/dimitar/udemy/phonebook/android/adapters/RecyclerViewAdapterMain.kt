@@ -14,15 +14,15 @@ import dimitar.udemy.phonebook.models.visuals.MainContactVisualization
 import dimitar.udemy.phonebook.presenters.MainPresenter
 
 class RecyclerViewAdapterMain (
-    private val list: ArrayList<MainContactVisualization>,
-    private val context: Context,
-    private val presenter: MainPresenter
+    private val list        : ArrayList<MainContactVisualization>,
+    private val context     : Context,
+    private val presenter   : MainPresenter
         ) : ListAdapter<MainContactVisualization, RecyclerViewAdapterMain.MyViewHolder>(DIFF_CALLBACK){
 
     class MyViewHolder(binding: ItemContactBinding) : RecyclerView.ViewHolder(binding.root) {
-        val civPerson = binding.ivContactImage
-        val tvName = binding.tvName
-        val llContact = binding.llContact
+        val civPerson   = binding.ivContactImage
+        val tvName      = binding.tvName
+        val llContact   = binding.llContact
     }
 
     companion object {
@@ -78,10 +78,10 @@ class RecyclerViewAdapterMain (
     }
 
     fun addNew(new: ArrayList<MainContactVisualization>) {
-        submitList(ArrayList(new))
+        submitList(new)
     }
 
-    fun visualize() {
+    fun refresh() {
         submitList(list)
     }
 

@@ -7,12 +7,13 @@ import dimitar.udemy.phonebook.models.data.ProfileModel
 
 class OverviewContactPresenter(private val view: OverviewContactPresenter.View) {
 
-    private val contactsDao = ContactsDao()
-    private var contact: ProfileModel? = null
+    private val contactsDao : ContactsDao   = ContactsDao()
+    private var contact     : ProfileModel? = null
 
     private fun requestInformationForContact(id: Long) {
         try {
             contact = contactsDao.getById(id)
+
             view.loadInformationForContact(contact!!)
             view.onSuccessfulRetrievalOfInformation()
         } catch (e: Exception) {
@@ -44,7 +45,6 @@ class OverviewContactPresenter(private val view: OverviewContactPresenter.View) 
         } else {
             view.onFailedDelete()
         }
-
     }
 
     fun goToEditView() {

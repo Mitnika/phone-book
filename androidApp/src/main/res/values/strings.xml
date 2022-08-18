@@ -15,4 +15,16 @@
     <string name="save_changes_add_edit_contact_text">Save Changes</string>
     <string name="activity_overview_edit_content_description">Edit</string>
 
+    <string name="on_success_information">Information retrieved successfully</string>
+    <string name="on_failed_retrieval">There was something wrong with the retrieval of information</string>
+    <string name="edit_success">Contact edited successfully</string>
+    <string name="edit_failure">There was something wrong with the save</string>
+    <string name="select_action">Select Action</string>
+    <string name="library_choice">Select photo from library</string>
+    <string name="camera_choice">Capture photo from camera</string>
+    <string name="msg_image_save">Photo capture failed: %1$s</string>
+    <string name="successful_capture">Photo capture succeeded: %1$s</string>
+    <string name="failed_deletion">Failed deletion</string>
+    <string name="successful_deletion">Successfully Deleted</string>
+
 </resources>

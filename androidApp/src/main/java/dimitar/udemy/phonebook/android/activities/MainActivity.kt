@@ -30,11 +30,11 @@ import me.zhanghai.android.fastscroll.FastScrollerBuilder
 
 class MainActivity : AppCompatActivity(), MainPresenter.View {
 
-    private var binding: ActivityMainBinding? = null
-    private var itemAdapter: RecyclerViewAdapterMain? = null
-    private val presenter: MainPresenter = MainPresenter(this, DatabaseDriverFactory(this))
-    private var progressDialog: Dialog? = null
-    private val unconfinedScope = CoroutineScope(Dispatchers.Unconfined)
+    private var binding         : ActivityMainBinding?      = null
+    private var itemAdapter     : RecyclerViewAdapterMain?  = null
+    private val presenter       : MainPresenter             = MainPresenter(this, DatabaseDriverFactory(this))
+    private var progressDialog  : Dialog?                   = null
+    private val unconfinedScope                             = CoroutineScope(Dispatchers.Unconfined)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,9 +42,6 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding?.root)
         setUpActionBar()
-        setUpRecyclerView(ArrayList())
-        itemAdapter!!.visualize()
-        setUpSearchView()
     }
 
     override fun onResume() {
@@ -67,9 +64,9 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
 
     override fun visualizeContacts(contacts: List<MainContactVisualization>) {
         if (itemAdapter == null) {
-            runBlocking {
+            runOnUiThread {
                 setUpRecyclerView(contacts)
-                itemAdapter!!.visualize()
+                itemAdapter!!.refresh()
                 setUpSearchView()
             }
         } else {
@@ -102,6 +99,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
         itemAdapter = RecyclerViewAdapterMain(ArrayList(contacts), this@MainActivity, presenter)
 
         binding?.rvAllContacts?.adapter = itemAdapter
+        itemAdapter!!.refresh()
 
         FastScrollerBuilder(binding?.rvAllContacts!!)
             .setPopupStyle{
@@ -110,20 +108,22 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
             }
             .setThumbDrawable(ContextCompat.getDrawable(this, R.drawable.ic_sideways_arrow)!!)
             .build()
+
+        setUpSearchView()
     }
 
     override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
+        requestCode     : Int,
+        permissions     : Array<out String>,
+        grantResults    : IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_PERMISSIONS -> {
-                presenter.setAllPermissions(grantResults[0] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[1] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[2] == PackageManager.PERMISSION_GRANTED
-                        && grantResults[3] == PackageManager.PERMISSION_GRANTED)
+                presenter.setAllPermissions(grantResults[PERMISSION_READ_STORAGE] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[PERMISSION_READ_CONTACTS] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[PERMISSION_CAMERA] == PackageManager.PERMISSION_GRANTED
+                        && grantResults[PERMISSION_WRITE_STORAGE] == PackageManager.PERMISSION_GRANTED)
             }
         }
     }
@@ -205,7 +205,6 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     private fun setUpActionBar() {
-
         binding?.addContact?.setOnClickListener {
             presenter.addNewContactRequest()
         }
@@ -221,26 +220,18 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
             null,
             ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME + " ASC"
         )
+
         if (contactsCursor != null && contactsCursor.count > 0) {
-            val idIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts._ID)
-            val pictureIndex = contactsCursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI)
+
+            val idIndex         = contactsCursor.getColumnIndex(ContactsContract.Contacts._ID)
+            val pictureIndex    = contactsCursor.getColumnIndex(ContactsContract.Contacts.PHOTO_URI)
 
             while (contactsCursor.moveToNext()) {
-                val externalId = contactsCursor.getString(idIndex)
-                val names = getNamesOfUser(externalId)
-                val picture = contactsCursor.getString(pictureIndex) ?: ""
-                val cont = BaseContactModel(
-                    names?.first ?: "",
-                    names?.second ?: "",
-                    picture,
-                    externalId
-                    )
-                result.add(
-                    ExternalContactModel(
-                    cont,
-                    getContactNumbers(externalId)
-                )
-                )
+                val externalId  = contactsCursor.getString(idIndex)
+                val names       = getNamesOfUser(externalId)
+                val picture     = contactsCursor.getString(pictureIndex) ?: ""
+                val cont        = BaseContactModel(names?.first ?: "", names?.second ?: "", picture, externalId)
+                result.add(ExternalContactModel(cont, getContactNumbers(externalId)))
             }
         }
         contactsCursor?.close()
@@ -256,16 +247,20 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
             arrayOf(ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE ,contactId),
             null
         )
+
         var result: Pair<String, String>? = null
+
         if (nameCursor != null && nameCursor.count > 0)  {
-            val givenNameIndex = nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
-            val familyNameIndex = nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+            val givenNameIndex      = nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+            val familyNameIndex     = nameCursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
 
             while (nameCursor.moveToNext()) {
-                val firstName = nameCursor.getString(givenNameIndex) ?: ""
-                val lastName = nameCursor.getString(familyNameIndex) ?: ""
+                val firstName   = nameCursor.getString(givenNameIndex) ?: ""
+                val lastName    = nameCursor.getString(familyNameIndex) ?: ""
+
                 Log.i("Given name: ", firstName)
                 Log.i("Family name: ", lastName)
+
                 if (result == null) {
                     result = Pair(firstName, lastName)
                 }
@@ -287,15 +282,17 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
         )
 
         if (phoneCursor != null && phoneCursor.count > 0) {
-            val phoneIdIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)
-            val numberIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
-            val contactIdIndex = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
+            val phoneIdIndex    = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone._ID)
+            val numberIndex     = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)
+            val contactIdIndex  = phoneCursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID)
 
             while (phoneCursor.moveToNext()) {
-                val phoneNumber = phoneCursor.getString(numberIndex)
-                val idPhone = phoneCursor.getString(phoneIdIndex)
-                val contactExternalId = phoneCursor.getString(contactIdIndex)
+                val phoneNumber         = phoneCursor.getString(numberIndex)
+                val idPhone             = phoneCursor.getString(phoneIdIndex)
+                val contactExternalId   = phoneCursor.getString(contactIdIndex)
+
                 Log.i("Phone Number", "Id: $idPhone Phone Number: $phoneNumber Contact Id: $contactExternalId")
+
                 result.add(BasePhoneModel(phoneNumber, idPhone))
             }
         }
@@ -304,7 +301,11 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     companion object {
-        const val REQUEST_PERMISSIONS = 4
-        const val ID_EXTRA = "id_extra"
+        const val PERMISSION_READ_STORAGE   = 0
+        const val PERMISSION_READ_CONTACTS  = 1
+        const val PERMISSION_CAMERA         = 2
+        const val PERMISSION_WRITE_STORAGE  = 3
+        const val REQUEST_PERMISSIONS       = 4
+        const val ID_EXTRA                  = "id_extra"
     }
 }

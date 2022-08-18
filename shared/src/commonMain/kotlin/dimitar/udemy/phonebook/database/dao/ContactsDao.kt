@@ -13,14 +13,14 @@ import dimitar.udemy.phonebook.models.data.ProfileModel
 import dimitar.udemy.phonebook.presenters.MainPresenter
 
 class ContactsDao {
-    private var database: Database = DatabaseProvider.getInstance()
-    private var dbQueries = database.dbQuery
-    private var phoneNumbersDao = PhoneNumbersDao()
+    private var database    : Database  = DatabaseProvider.getInstance()
+    private var dbQueries               = database.dbQuery
+    private var phoneNumbersDao         = PhoneNumbersDao()
 
     internal fun getById(id: Long): ProfileModel {
         return ProfileModel(
-            dbQueries.retrieveAContactById(id, ::mapToContactModel).executeAsOne(),
-            phoneNumbersDao.getByContactId(id)
+            contactModel    = dbQueries.retrieveAContactById(id, ::mapToContactModel).executeAsOne(),
+            phones          = phoneNumbersDao.getByContactId(id)
         )
     }
 
@@ -112,27 +112,15 @@ class ContactsDao {
     }
 
     private fun updateFirstName(id: Long, name: String, state: String) {
-        dbQueries.updateFirstNameOfAContact(
-            name,
-            state,
-            id
-        )
+        dbQueries.updateFirstNameOfAContact(name, state, id)
     }
 
     private fun updateLastName(id: Long, name: String, state: String) {
-        dbQueries.updateLastNameOfAContact(
-            name,
-            state,
-            id
-        )
+        dbQueries.updateLastNameOfAContact(name, state, id)
     }
 
     private fun updatePicture(id: Long, picture: String, state: String) {
-        dbQueries.updatePictureOfAContact(
-            picture,
-            state,
-            id
-        )
+        dbQueries.updatePictureOfAContact(picture, state, id)
     }
 
     internal fun syncFromOutside(contactFromDB: ProfileModel, contact: ExternalContactModel) {
@@ -164,13 +152,13 @@ class ContactsDao {
             if (phoneFromDB.baseModel.number != number.number) {
                 phoneNumbersDao.update(
                     PhoneModel(
-                    phoneFromDB.id,
-                    BasePhoneModel(
-                        number.number,
-                        phoneFromDB.baseModel.externalId
-                    ),
-                    StateConstants.STATE_EDITABLE
-                )
+                        phoneFromDB.id,
+                        BasePhoneModel(
+                            number.number,
+                            phoneFromDB.baseModel.externalId
+                        ),
+                        StateConstants.STATE_EDITABLE
+                    )
                 )
             }
         }
@@ -194,17 +182,10 @@ class ContactsDao {
         }
     }
 
-
-
     internal fun markDeletedById(id: Long) {
         dbQueries.transaction {
             dbQueries.markAsDeletedAContact(id)
             dbQueries.markAsDeletedPhoneNumbersOfAContact(id)
         }
-    }
-
-    internal fun getLastInsertedId(): Long {
-        return dbQueries.lastIndexRowId().executeAsOne()
-
     }
 }

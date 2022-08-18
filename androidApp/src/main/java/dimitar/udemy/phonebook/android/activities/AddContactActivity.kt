@@ -34,14 +34,14 @@ import kotlin.collections.ArrayList
 
 class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
 
-    private var binding: ActivityAddEditContactBinding? = null
-    private var presenter: AddContactPresenter = AddContactPresenter(this)
-    private var itemAdapter: RecyclerViewAdapterAdd? = null
-    private val scope = MainScope()
+    private var binding     : ActivityAddEditContactBinding?    = null
+    private var presenter   : AddContactPresenter               = AddContactPresenter(this)
+    private var itemAdapter : RecyclerViewAdapterAdd?           = null
+    private val scope                                           = MainScope()
 
-    private var imageCapture: ImageCapture? = null
-    private lateinit var outputDirectory: File
-    private lateinit var cameraExecutor: ExecutorService
+    private var             imageCapture        : ImageCapture? = null
+    private lateinit var    outputDirectory     : File
+    private lateinit var    cameraExecutor      : ExecutorService
 
     private val selectImageFromGalleryResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
@@ -58,8 +58,8 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         setUpRV()
         startCamera()
 
-        outputDirectory = getOutputDirectory()
-        cameraExecutor = Executors.newSingleThreadExecutor()
+        outputDirectory     = getOutputDirectory()
+        cameraExecutor      = Executors.newSingleThreadExecutor()
 
         binding?.civProfilePic?.setOnClickListener {
             presenter.choosePicture()
@@ -145,10 +145,11 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
 
     override fun openDialogToChooseOptionForImage() {
         val picDialog = AlertDialog.Builder(this)
-        picDialog.setTitle("Select Action")
+        picDialog.setTitle(resources.getString(R.string.select_action))
+
         val pictureDialogOptions = arrayOf(
-            "Select photo from library",
-            "Capture photo from camera"
+            resources.getString(R.string.library_choice),
+            resources.getString(R.string.camera_choice)
         )
 
         picDialog.setItems(pictureDialogOptions) {
@@ -220,19 +221,24 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
             outputOptions, ContextCompat.getMainExecutor(this), object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e(TAG, "Photo capture failed: ${exc.message}", exc)
-                    binding?.viewFinder?.visibility = View.GONE
-                    binding?.cardView?.visibility = View.VISIBLE
+
+                    binding?.viewFinder?.visibility     = View.GONE
+                    binding?.cardView?.visibility       = View.VISIBLE
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    val savedUri = Uri.fromFile(photoFile)
-                    val msg = "Photo capture succeeded: $savedUri"
+                    val savedUri    = Uri.fromFile(photoFile)
+                    val msg         = "Photo capture succeeded: $savedUri"
+
                     Toast.makeText(baseContext, msg, Toast.LENGTH_SHORT).show()
+
                     Log.d(TAG, msg)
+
                     presenter.onSuccessfulLoadOfPicture(savedUri.toString())
                     binding?.civProfilePic?.setImageURI(savedUri)
-                    binding?.viewFinder?.visibility = View.GONE
-                    binding?.cardView?.visibility = View.VISIBLE
+
+                    binding?.viewFinder?.visibility     = View.GONE
+                    binding?.cardView?.visibility       = View.VISIBLE
                 }
             })
     }
@@ -267,8 +273,8 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     }
 
     companion object {
-        private const val TAG = "PhonebookApp"
-        private const val FILENAME_FORMAT = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val TAG               = "PhonebookApp"
+        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
 }

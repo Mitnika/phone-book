@@ -8,8 +8,8 @@ import dimitar.udemy.phonebook.models.data.PhoneModel
 
 class PhoneNumbersDao {
 
-    private var database: Database = DatabaseProvider.getInstance()
-    private var dbQueries = database.dbQuery
+    private var database: Database  = DatabaseProvider.getInstance()
+    private var dbQueries           = database.dbQuery
 
     internal fun update(phone: PhoneModel) {
         dbQueries.transaction {
@@ -23,14 +23,14 @@ class PhoneNumbersDao {
 
     internal fun insert(phone: BasePhoneModel, contactId: Long, state: String) {
         dbQueries.insertPhone(
-            number =        phone.number,
-            contactId =     contactId,
-            externalId =    phone.externalId,
-            state =         state
+            number      = phone.number,
+            contactId   = contactId,
+            externalId  = phone.externalId,
+            state       = state
         )
     }
 
-    internal fun getById(id: Long): PhoneModel? {
+    private fun getById(id: Long): PhoneModel? {
         return dbQueries.retrieveAPhoneById(id, ::mapToPhoneModel).executeAsOneOrNull()
     }
 
@@ -65,7 +65,7 @@ class PhoneNumbersDao {
         }
     }
 
-    internal fun markAsDeletedById(id: Long) {
+    private fun markAsDeletedById(id: Long) {
         dbQueries.markAsDeletedAPhoneNumber(id)
     }
 
@@ -73,12 +73,8 @@ class PhoneNumbersDao {
         dbQueries.markAsDeletedPhoneNumbersOfAContact(contactId)
     }
 
-    internal fun deleteById(id: Long) {
+    private fun deleteById(id: Long) {
         dbQueries.deletePhoneFromTheDatabase(id)
-    }
-
-    internal fun getLastInsertedId(): Long {
-        return dbQueries.lastIndexRowId().executeAsOne()
     }
 
     internal fun update(number: PhoneModel, contactId: Long) {
@@ -91,11 +87,7 @@ class PhoneNumbersDao {
                 return
             }
             if (phoneFromDB.baseModel.number != number.baseModel.number) {
-                update(PhoneModel(
-                    number.id,
-                    number.baseModel,
-                    StateConstants.STATE_UNEDITABLE
-                ))
+                update(PhoneModel(number.id, number.baseModel, StateConstants.STATE_UNEDITABLE))
             }
         } else {
             if (number.state == StateConstants.STATE_DELETED) {
@@ -104,11 +96,7 @@ class PhoneNumbersDao {
                 }
                 return
             }
-            insert(
-                number.baseModel,
-                contactId,
-                StateConstants.STATE_UNEDITABLE
-            )
+            insert(number.baseModel, contactId, StateConstants.STATE_UNEDITABLE)
         }
     }
 
