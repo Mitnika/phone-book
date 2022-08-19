@@ -39,22 +39,22 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     private var binding         : ActivityAddEditContactBinding?    = null
     private var presenter       : EditContactPresenter              = EditContactPresenter(this)
     private var itemAdapter     : RecyclerViewAdapterEdit?          = null
-    private val scope                                               = CoroutineScope(Dispatchers.IO)
+    private val ioScope                                             = CoroutineScope(Dispatchers.IO)
+    private val mainScope                                           = CoroutineScope(Dispatchers.Main)
 
     private var             imageCapture    : ImageCapture? = null
     private lateinit var    outputDirectory : File
     private lateinit var    cameraExecutor  : ExecutorService
 
+    companion object {
+        private const val TAG               = "PhonebookApp"
+        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val GALLERY           = 0
+        private const val CAMERA            = 1
+    }
 
     private val selectImageFromGalleryResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            Glide
-                .with(this)
-                .load(uri)
-                .centerCrop()
-                .placeholder(R.drawable.ic_baseline_person_24)
-                .into(binding?.civProfilePic!!)
-            //binding?.civProfilePic?.setImageURI(uri)
             presenter.onSuccessfulLoadOfPicture(uri.toString())
         }
     }
@@ -63,8 +63,6 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         super.onCreate(savedInstanceState)
         binding = ActivityAddEditContactBinding.inflate(layoutInflater)
         setContentView(binding?.root)
-
-
 
         outputDirectory = getOutputDirectory()
         cameraExecutor  = Executors.newSingleThreadExecutor()
@@ -81,6 +79,33 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         binding?.btnSaveChanges?.setOnClickListener {
             onSavePressed()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.subscribe()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detachView()
+        binding = null
+        ioScope.cancel()
+        mainScope.cancel()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.unsubscribe()
+    }
+
+    override fun setImage(uri: String) {
+        Glide
+            .with(this)
+            .load(uri)
+            .centerCrop()
+            .placeholder(R.drawable.ic_baseline_person_24)
+            .into(binding?.civProfilePic!!)
     }
 
     override fun startCamera() {
@@ -142,7 +167,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
             ),
             phones      = itemAdapter!!.getPhoneNumbers()
         )
-        scope.launch {
+        ioScope.launch {
             kotlin.runCatching {
                 presenter.onEditClicked(contact)
             }.onFailure {
@@ -153,25 +178,8 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.subscribe()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        presenter.detachView()
-        binding = null
-        scope.cancel()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.unsubscribe()
-    }
-
     override fun getIdExtra() {
-        scope.runCatching {
+        ioScope.runCatching {
             presenter.getInformation(intent.getLongExtra(OverviewContactActivity.ID_EXTRA, -1))
         }.onFailure {
             onFailedRetrievalOfInformation()
@@ -181,72 +189,52 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     }
 
     override fun onSuccessfulRetrievalOfInformation() {
-        runOnUiThread { Toast.makeText(
-            this,
-            resources.getString(R.string.on_success_information),
-            Toast.LENGTH_SHORT
-        ).show()
+        mainScope.launch {
+            Toast.makeText(this@EditContactActivity, resources.getString(R.string.on_success_information), Toast.LENGTH_SHORT).show()
         }
     }
 
     override fun onFailedRetrievalOfInformation() {
-        runOnUiThread {
-            Toast.makeText(
-                this,
-                resources.getString(R.string.on_failed_retrieval),
-                Toast.LENGTH_LONG
-            ).show()
+        mainScope.launch {
+            Toast.makeText(this@EditContactActivity, resources.getString(R.string.on_failed_retrieval), Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onEditSuccess() {
-        runOnUiThread {
-            Toast.makeText(
-                applicationContext,
-                resources.getString(R.string.edit_success),
-                Toast.LENGTH_SHORT
-            ).show()
+        mainScope.launch {
+            Toast.makeText(applicationContext, resources.getString(R.string.edit_success), Toast.LENGTH_SHORT).show()
             onBackPressed()
         }
     }
 
     override fun onEditFailure() {
-        runOnUiThread {
-            Toast.makeText(
-                this,
-                resources.getString(R.string.edit_failure),
-                Toast.LENGTH_LONG
-            ).show()
+        mainScope.launch { Toast.makeText(this@EditContactActivity, resources.getString(R.string.edit_failure), Toast.LENGTH_LONG).show()
         }
     }
 
     override fun onInvalidField(kind: InvalidType) {
-        Toast.makeText(
-            this,
-            kind.errorMessage,
-            Toast.LENGTH_LONG
-        ).show()
+        mainScope.launch{
+            Toast.makeText(this@EditContactActivity, kind.errorMessage, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun loadInformationForAContact(contact: ProfileModel) {
-        if (contact.contactModel.baseModel.picture.isNotEmpty()) {
-            binding?.civProfilePic?.setImageURI(Uri.parse(contact.contactModel.baseModel.picture))
+        mainScope.launch {
+            if (contact.contactModel.baseModel.picture.isNotEmpty()) {
+                binding?.civProfilePic?.setImageURI(Uri.parse(contact.contactModel.baseModel.picture))
+            }
+
+            binding?.etFName?.setText(contact.contactModel.baseModel.firstName)
+            binding?.etLName?.setText(contact.contactModel.baseModel.lastName)
+
+            binding?.rvPhoneNumberList?.layoutManager = LinearLayoutManager(this@EditContactActivity, LinearLayoutManager.VERTICAL, false)
+
+            itemAdapter = RecyclerViewAdapterEdit(ArrayList(contact.phones))
+
+            binding?.rvPhoneNumberList?.adapter = itemAdapter
+
+            itemAdapter!!.visualize()
         }
-
-        binding?.etFName?.setText(contact.contactModel.baseModel.firstName)
-        binding?.etLName?.setText(contact.contactModel.baseModel.lastName)
-
-        binding?.rvPhoneNumberList?.layoutManager = LinearLayoutManager(
-            this,
-            LinearLayoutManager.VERTICAL,
-            false
-        )
-
-        itemAdapter = RecyclerViewAdapterEdit(ArrayList(contact.phones))
-
-        binding?.rvPhoneNumberList?.adapter = itemAdapter
-
-        itemAdapter!!.visualize()
     }
 
     override fun openDialogToChooseOptionForImage() {
@@ -260,8 +248,8 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         picDialog.setItems(pictureDialogOptions) {
                 _, which ->
             when (which) {
-                0 -> chooseImageFromGallery()
-                1 -> goToCamera()
+                GALLERY -> chooseImageFromGallery()
+                CAMERA -> goToCamera()
             }
         }
         picDialog.show()
@@ -320,12 +308,6 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
                     binding?.cardView?.visibility   = View.VISIBLE
                 }
             })
-    }
-
-
-    companion object {
-        private const val TAG               = "PhonebookApp"
-        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
 }

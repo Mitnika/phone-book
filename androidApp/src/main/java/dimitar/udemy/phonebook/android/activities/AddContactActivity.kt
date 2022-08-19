@@ -191,7 +191,9 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     }
 
     private fun showError(error: String) {
-        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
+        mainScope.launch {
+            Toast.makeText(this@AddContactActivity, error, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun chooseImageFromGallery() {

@@ -40,6 +40,7 @@ class EditContactPresenter(private val view: View) {
 
     fun onSuccessfulLoadOfPicture(picture: String) {
         this.picture = picture
+        view.setImage(picture)
     }
 
     private fun validateContact(contact: ProfileModel): InvalidType? {
@@ -106,5 +107,7 @@ class EditContactPresenter(private val view: View) {
         fun loadInformationForAContact(contact: ProfileModel)
 
         fun openDialogToChooseOptionForImage()
+
+        fun setImage(uri: String)
     }
 }
