@@ -19,6 +19,9 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
     private var itemAdapter : RecyclerViewAdapterOverview?      = null
     private val presenter   : OverviewContactPresenter          = OverviewContactPresenter(this)
 
+    companion object {
+        const val ID_EXTRA = "id_extra"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -113,9 +116,5 @@ class OverviewContactActivity : AppCompatActivity(), OverviewContactPresenter.Vi
             resources.getString(R.string.failed_deletion),
             Toast.LENGTH_LONG
         ).show()
-    }
-
-    companion object {
-        const val ID_EXTRA = "id_extra"
     }
 }
