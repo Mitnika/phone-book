@@ -3,16 +3,17 @@ package dimitar.udemy.phonebook.presenters
 import dimitar.udemy.phonebook.database.dao.ContactsDao
 import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.datamanagers.ContactManager
+import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.data.ProfileModel
 
 class OverviewContactPresenter(private val view: View) {
 
-    private val contactsDao : ContactsDao   = ContactsDao()
-    private var contact     : ProfileModel? = null
+    private val contactManager  : ContactManager    = ContactManagerProvider.getInstance()
+    private var contact         : ProfileModel?     = null
 
     private fun requestInformationForContact(id: Long) {
         try {
-            contact = contactsDao.getById(id)
+            contact = contactManager.getContactById(id)
 
             view.loadInformationForContact(contact!!)
             view.onSuccessfulRetrievalOfInformation()
@@ -36,7 +37,7 @@ class OverviewContactPresenter(private val view: View) {
     fun deleteAContact() {
         if (contact != null) {
             try {
-                ContactManager(contactsDao, PhoneNumbersDao()).deleteAContact(contact!!)
+                contactManager.deleteAContact(contact!!)
                 view.onSuccessfulDelete()
             } catch (e: Exception) {
                 view.onFailedDelete()
