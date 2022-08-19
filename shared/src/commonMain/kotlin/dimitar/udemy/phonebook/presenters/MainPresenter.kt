@@ -3,9 +3,8 @@ package dimitar.udemy.phonebook.presenters
 import dimitar.udemy.phonebook.database.cache.Database
 import dimitar.udemy.phonebook.database.cache.DatabaseDriverFactory
 import dimitar.udemy.phonebook.database.cache.DatabaseProvider
-import dimitar.udemy.phonebook.database.dao.ContactsDao
-import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.datamanagers.ContactManager
+import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.data.ExternalContactModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
 import dimitar.udemy.phonebook.models.visuals.MainContactVisualization
@@ -16,14 +15,13 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
 
     private var contacts        : List<ProfileModel>?   = null
     private val database        : Database              = DatabaseProvider.initializeDatabase(databaseDriverFactory)
-    private val phoneNumbersDao : PhoneNumbersDao       = PhoneNumbersDao()
-    private val contactsDao     : ContactsDao           = ContactsDao()
+    private val contactManager  : ContactManager        = ContactManagerProvider.getInstance()
     private var entirely        : Boolean               = true
 
 
     fun synchronizeDatabases(contacts: List<ExternalContactModel>) {
         entirely = false
-        ContactManager(contactsDao, phoneNumbersDao).syncContacts(contacts)
+        contactManager.syncContacts(contacts)
     }
 
 
@@ -112,7 +110,7 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
     }
 
     private suspend fun getContacts() = withContext(Dispatchers.Default) {
-        contactsDao.getAllForDisplay(this@MainPresenter)
+        contactManager.getAllForDisplay(this@MainPresenter)
     }
 
     interface View {

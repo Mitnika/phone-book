@@ -5,6 +5,7 @@ import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.models.StateConstants
 import dimitar.udemy.phonebook.models.data.ExternalContactModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
+import dimitar.udemy.phonebook.presenters.MainPresenter
 
 class ContactManager(
     private val contactsDao     : ContactsDao,
@@ -59,5 +60,9 @@ class ContactManager(
 
     fun getContactById(id: Long): ProfileModel {
         return contactsDao.getById(id)
+    }
+
+    fun getAllForDisplay(presenter: MainPresenter) {
+        contactsDao.getAllForDisplay(presenter)
     }
 }
