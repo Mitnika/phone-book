@@ -1,8 +1,7 @@
 package dimitar.udemy.phonebook.presenters
 
-import dimitar.udemy.phonebook.database.dao.ContactsDao
-import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.datamanagers.ContactManager
+import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.InvalidType
 import dimitar.udemy.phonebook.models.StateConstants
 import dimitar.udemy.phonebook.models.data.PhoneModel
@@ -10,9 +9,7 @@ import dimitar.udemy.phonebook.models.data.ProfileModel
 
 class EditContactPresenter(private val view: View) {
 
-    private val contactsDao     : ContactsDao       = ContactsDao()
-    private val phoneNumbersDao : PhoneNumbersDao   = PhoneNumbersDao()
-    private val contactManager  : ContactManager    = ContactManager(contactsDao, phoneNumbersDao)
+    private val contactManager  : ContactManager    = ContactManagerProvider.getInstance()
     private var picture         : String?           = null
     private var contact         : ProfileModel?     = null
 
@@ -37,7 +34,7 @@ class EditContactPresenter(private val view: View) {
     }
 
     fun getInformation(id: Long) {
-        contact = contactsDao.getById(id)
+        contact = contactManager.getContactById(id)
         view.loadInformationForAContact(contact!!)
     }
 

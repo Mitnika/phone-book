@@ -56,4 +56,8 @@ class ContactManager(
     fun insertAContact(contact: ExternalContactModel, state: String) {
         contactsDao.insert(contact, state)
     }
+
+    fun getContactById(id: Long): ProfileModel {
+        return contactsDao.getById(id)
+    }
 }

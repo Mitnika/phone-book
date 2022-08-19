@@ -2,8 +2,6 @@ package dimitar.udemy.phonebook.presenters
 
 import dimitar.udemy.phonebook.models.InvalidType
 import dimitar.udemy.phonebook.models.StateConstants
-import dimitar.udemy.phonebook.database.dao.ContactsDao
-import dimitar.udemy.phonebook.database.dao.ContactsDaoProvider
 import dimitar.udemy.phonebook.datamanagers.ContactManager
 import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.base.BasePhoneModel
