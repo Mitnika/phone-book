@@ -156,14 +156,10 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     private fun onSavePressed() {
         val contact = ProfileModel(
             contactModel = ContactModel(
-                id          = presenter.getId(),
                 baseModel   = BaseContactModel(
                     firstName   = binding!!.etFName.text.toString(),
                     lastName    = binding!!.etLName.text.toString(),
-                    picture     = presenter.getPicture(),
-                    externalId  = presenter.getExternalId()
                 ),
-                state       = presenter.getState()
             ),
             phones      = itemAdapter!!.getPhoneNumbers()
         )

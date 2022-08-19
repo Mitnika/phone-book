@@ -4,6 +4,8 @@ import dimitar.udemy.phonebook.datamanagers.ContactManager
 import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.InvalidType
 import dimitar.udemy.phonebook.models.StateConstants
+import dimitar.udemy.phonebook.models.base.BaseContactModel
+import dimitar.udemy.phonebook.models.data.ContactModel
 import dimitar.udemy.phonebook.models.data.PhoneModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
 
@@ -12,14 +14,6 @@ class EditContactPresenter(private val view: View) {
     private val contactManager  : ContactManager    = ContactManagerProvider.getInstance()
     private var picture         : String?           = null
     private var contact         : ProfileModel?     = null
-
-    fun getId()             : Long      = contact!!.contactModel.id
-
-    fun getState()          : String    = contact!!.contactModel.state
-
-    fun getPicture()        : String    = picture ?: contact?.contactModel?.baseModel?.picture ?: ""
-
-    fun getExternalId()     : String?   = contact!!.contactModel.baseModel.externalId
 
     fun subscribe() {
         view.getIdExtra()
@@ -72,7 +66,21 @@ class EditContactPresenter(private val view: View) {
         return null
     }
 
-    fun onEditClicked(profile: ProfileModel) {
+    fun onEditClicked(outerProfile: ProfileModel) {
+        val profile = ProfileModel(
+            contactModel = ContactModel(
+                id          = contact!!.contactModel.id,
+                baseModel   = BaseContactModel(
+                    firstName   = outerProfile.contactModel.baseModel.firstName,
+                    lastName    = outerProfile.contactModel.baseModel.lastName,
+                    picture     = getPicture(),
+                    externalId  = contact!!.contactModel.baseModel.externalId
+                ),
+                state       = contact!!.contactModel.state
+            ),
+            phones      = outerProfile.phones
+        )
+
         val error = validateContact(profile)
 
         if (error != null) {
@@ -81,8 +89,9 @@ class EditContactPresenter(private val view: View) {
         } else {
             contactManager.updateAProfile(profile)
         }
-
     }
+
+    private fun getPicture(): String = picture ?: contact?.contactModel?.baseModel?.picture ?: ""
 
     fun changeOfImage() {
         view.openDialogToChooseOptionForImage()
