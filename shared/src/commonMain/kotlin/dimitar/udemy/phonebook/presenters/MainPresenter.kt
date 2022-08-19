@@ -8,16 +8,16 @@ import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.data.ExternalContactModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
 import dimitar.udemy.phonebook.models.visuals.MainContactVisualization
+import dimitar.udemy.phonebook.phonedata.ContactRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDriverFactory) {
+class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDriverFactory, private val contactRetriever: ContactRetriever) {
 
     private var contacts        : List<ProfileModel>?   = null
     private val database        : Database              = DatabaseProvider.initializeDatabase(databaseDriverFactory)
     private val contactManager  : ContactManager        = ContactManagerProvider.getInstance()
     private var entirely        : Boolean               = true
-
 
     fun synchronizeDatabases(contacts: List<ExternalContactModel>) {
         entirely = false
@@ -52,7 +52,7 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
             view.showLoadingDialog()
             if (entirely) {
                 entirely = false
-                view.requestContactsFromPhone()
+                contactRetriever.requestContactsFromPhone(this)
             }
             view.requestInformation()
             view.hideLoadingDialog()
@@ -131,8 +131,6 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
         fun showLoadingDialog()
 
         fun hideLoadingDialog()
-
-        fun requestContactsFromPhone()
 
         fun requestInformation()
     }
