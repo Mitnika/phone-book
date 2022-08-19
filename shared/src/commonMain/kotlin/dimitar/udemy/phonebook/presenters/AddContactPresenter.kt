@@ -3,13 +3,16 @@ package dimitar.udemy.phonebook.presenters
 import dimitar.udemy.phonebook.models.InvalidType
 import dimitar.udemy.phonebook.models.StateConstants
 import dimitar.udemy.phonebook.database.dao.ContactsDao
+import dimitar.udemy.phonebook.database.dao.ContactsDaoProvider
+import dimitar.udemy.phonebook.datamanagers.ContactManager
+import dimitar.udemy.phonebook.datamanagers.ContactManagerProvider
 import dimitar.udemy.phonebook.models.base.BasePhoneModel
 import dimitar.udemy.phonebook.models.data.ExternalContactModel
 
 class AddContactPresenter(private val view: View) {
 
-    private val contactsDao : ContactsDao   = ContactsDao()
-    private var picture     : String?       = null
+    private val contactManager  : ContactManager    = ContactManagerProvider.getInstance()
+    private var picture         : String?           = null
 
     fun saveContact(contact: ExternalContactModel) {
         val error = validateContact(contact)
@@ -19,7 +22,7 @@ class AddContactPresenter(private val view: View) {
             throw IllegalArgumentException(error.errorMessage)
         } else {
             try {
-                contactsDao.insert(contact, StateConstants.STATE_UNEDITABLE)
+                contactManager.insertAContact(contact, StateConstants.STATE_UNEDITABLE)
                 view.onSuccessfulSafeOfContact()
             } catch (e: Exception) {
                 view.onFailedSafeOfContact()
@@ -68,6 +71,7 @@ class AddContactPresenter(private val view: View) {
 
     fun onSuccessfulLoadOfPicture(picture: String) {
         this.picture = picture
+        view.loadNewImage(picture)
     }
 
     fun subscribe() {
@@ -92,6 +96,8 @@ class AddContactPresenter(private val view: View) {
         fun onSuccessfulSafeOfContact()
 
         fun onFailedSafeOfContact()
+
+        fun loadNewImage(uri: String)
     }
 
 }

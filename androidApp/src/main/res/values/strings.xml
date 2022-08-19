@@ -26,5 +26,7 @@
     <string name="successful_capture">Photo capture succeeded: %1$s</string>
     <string name="failed_deletion">Failed deletion</string>
     <string name="successful_deletion">Successfully Deleted</string>
+    <string name="successful_save">Contact has been saved successfully</string>
+    <string name="failed_save">Contact has not been saved successfully</string>
 
 </resources>

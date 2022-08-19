@@ -16,6 +16,7 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import dimitar.udemy.phonebook.android.R
 import dimitar.udemy.phonebook.android.adapters.RecyclerViewAdapterAdd
 import dimitar.udemy.phonebook.android.databinding.ActivityAddEditContactBinding
@@ -37,15 +38,22 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     private var binding     : ActivityAddEditContactBinding?    = null
     private var presenter   : AddContactPresenter               = AddContactPresenter(this)
     private var itemAdapter : RecyclerViewAdapterAdd?           = null
-    private val scope                                           = CoroutineScope(Dispatchers.IO)
+    private val ioScope                                         = CoroutineScope(Dispatchers.IO)
+    private val mainScope                                       = CoroutineScope(Dispatchers.Main)
 
     private var             imageCapture        : ImageCapture? = null
     private lateinit var    outputDirectory     : File
     private lateinit var    cameraExecutor      : ExecutorService
 
+    companion object {
+        private const val TAG               = "PhonebookApp"
+        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
+        private const val GALLERY           = 0
+        private const val CAMERA            = 1
+    }
+
     private val selectImageFromGalleryResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            binding?.civProfilePic?.setImageURI(uri)
             presenter.onSuccessfulLoadOfPicture(uri.toString())
         }
     }
@@ -73,6 +81,25 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         binding?.btnSaveChanges?.setOnClickListener {
             onSavePressed()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        presenter.subscribe()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.unsubscribe()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        binding = null
+        presenter.detachView()
+        cameraExecutor.shutdown()
+        ioScope.cancel()
+        mainScope.cancel()
     }
 
     override fun startCamera() {
@@ -120,30 +147,8 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
                 else filesDir
     }
 
-    override fun onResume() {
-        super.onResume()
-        presenter.subscribe()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        presenter.unsubscribe()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
-        presenter.detachView()
-        cameraExecutor.shutdown()
-        scope.cancel()
-    }
-
     override fun onInvalidField(kind: InvalidType) {
-        Toast.makeText(
-            this,
-            kind.errorMessage,
-            Toast.LENGTH_LONG
-        ).show()
+        Toast.makeText(this, kind.errorMessage, Toast.LENGTH_LONG).show()
     }
 
     override fun openDialogToChooseOptionForImage() {
@@ -158,8 +163,8 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         picDialog.setItems(pictureDialogOptions) {
             _, which ->
             when (which) {
-                0 -> chooseImageFromGallery()
-                1 -> goToCamera()
+                GALLERY -> chooseImageFromGallery()
+                CAMERA -> goToCamera()
             }
         }
         picDialog.show()
@@ -175,7 +180,7 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
             ),
             itemAdapter!!.getPhoneNumbers()
         )
-        scope.launch {
+        ioScope.launch {
             kotlin.runCatching {
                 presenter.saveContact(contact)
             }.onFailure {
@@ -186,11 +191,7 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     }
 
     private fun showError(error: String) {
-        Toast.makeText(
-            this,
-            error,
-            Toast.LENGTH_LONG
-        ).show()
+        Toast.makeText(this, error, Toast.LENGTH_LONG).show()
     }
 
     private fun chooseImageFromGallery() {
@@ -247,24 +248,25 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     }
 
     override fun onSuccessfulSafeOfContact() {
-        runOnUiThread {
-            Toast.makeText(
-                applicationContext,
-                "Contact has been saved successfully",
-                Toast.LENGTH_LONG
-            ).show()
+        mainScope.launch {
+            Toast.makeText(applicationContext, resources.getString(R.string.successful_save), Toast.LENGTH_LONG).show()
             onBackPressed()
         }
     }
 
     override fun onFailedSafeOfContact() {
-        runOnUiThread {
-            Toast.makeText(
-                this,
-                "Contact has not been saved successfully",
-                Toast.LENGTH_SHORT
-            ).show()
+        mainScope.launch {
+            Toast.makeText(this@AddContactActivity, resources.getString(R.string.failed_save), Toast.LENGTH_SHORT).show()
         }
+    }
+
+    override fun loadNewImage(uri: String) {
+        Glide
+            .with(this)
+            .load(uri)
+            .centerCrop()
+            .placeholder(R.drawable.ic_baseline_person_24)
+            .into(binding?.civProfilePic!!)
     }
 
     private fun setUpRV() {
@@ -276,12 +278,6 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
 
         itemAdapter = RecyclerViewAdapterAdd(ArrayList())
         binding?.rvPhoneNumberList?.adapter = itemAdapter
-
-    }
-
-    companion object {
-        private const val TAG               = "PhonebookApp"
-        private const val FILENAME_FORMAT   = "yyyy-MM-dd-HH-mm-ss-SSS"
     }
 
 }

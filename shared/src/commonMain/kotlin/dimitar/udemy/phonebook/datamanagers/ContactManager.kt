@@ -52,4 +52,8 @@ class ContactManager(
             contactsDao.markDeletedById(contact.contactModel.id)
         }
     }
+
+    fun insertAContact(contact: ExternalContactModel, state: String) {
+        contactsDao.insert(contact, state)
+    }
 }
