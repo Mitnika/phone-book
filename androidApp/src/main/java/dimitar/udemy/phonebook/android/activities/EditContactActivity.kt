@@ -13,8 +13,10 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.bumptech.glide.Glide
 import dimitar.udemy.phonebook.android.R
 import dimitar.udemy.phonebook.android.adapters.RecyclerViewAdapterEdit
 import dimitar.udemy.phonebook.android.databinding.ActivityAddEditContactBinding
@@ -24,8 +26,7 @@ import dimitar.udemy.phonebook.models.base.BasePhoneModel
 import dimitar.udemy.phonebook.models.data.ContactModel
 import dimitar.udemy.phonebook.models.data.ProfileModel
 import dimitar.udemy.phonebook.presenters.EditContactPresenter
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -38,7 +39,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     private var binding         : ActivityAddEditContactBinding?    = null
     private var presenter       : EditContactPresenter              = EditContactPresenter(this)
     private var itemAdapter     : RecyclerViewAdapterEdit?          = null
-    private val scope                                               = MainScope()
+    private val scope                                               = CoroutineScope(Dispatchers.IO)
 
     private var             imageCapture    : ImageCapture? = null
     private lateinit var    outputDirectory : File
@@ -47,7 +48,13 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
 
     private val selectImageFromGalleryResult = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri: Uri? ->
         uri?.let {
-            binding?.civProfilePic?.setImageURI(uri)
+            Glide
+                .with(this)
+                .load(uri)
+                .centerCrop()
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .into(binding?.civProfilePic!!)
+            //binding?.civProfilePic?.setImageURI(uri)
             presenter.onSuccessfulLoadOfPicture(uri.toString())
         }
     }
@@ -57,12 +64,13 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         binding = ActivityAddEditContactBinding.inflate(layoutInflater)
         setContentView(binding?.root)
 
-        startCamera()
+
 
         outputDirectory = getOutputDirectory()
         cameraExecutor  = Executors.newSingleThreadExecutor()
 
         binding?.civProfilePic?.setOnClickListener {
+            startCamera()
             presenter.changeOfImage()
         }
 
@@ -77,6 +85,8 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     }
 
     private fun startCamera() {
+        binding?.viewFinder?.preferredImplementationMode = PreviewView.ImplementationMode.TEXTURE_VIEW
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener( {
@@ -152,6 +162,8 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     override fun onDestroy() {
         super.onDestroy()
         presenter.detachView()
+        binding = null
+        scope.cancel()
     }
 
     override fun onPause() {
@@ -170,36 +182,43 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     }
 
     override fun onSuccessfulRetrievalOfInformation() {
-        Toast.makeText(
+        runOnUiThread { Toast.makeText(
             this,
             resources.getString(R.string.on_success_information),
             Toast.LENGTH_SHORT
         ).show()
+        }
     }
 
     override fun onFailedRetrievalOfInformation() {
-        Toast.makeText(
-            this,
-            resources.getString(R.string.on_failed_retrieval),
-            Toast.LENGTH_LONG
-        ).show()
+        runOnUiThread {
+            Toast.makeText(
+                this,
+                resources.getString(R.string.on_failed_retrieval),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     override fun onEditSuccess() {
-        Toast.makeText(
-            applicationContext,
-            resources.getString(R.string.edit_success),
-            Toast.LENGTH_SHORT
-        ).show()
-        onBackPressed()
+        runOnUiThread {
+            Toast.makeText(
+                applicationContext,
+                resources.getString(R.string.edit_success),
+                Toast.LENGTH_SHORT
+            ).show()
+            onBackPressed()
+        }
     }
 
     override fun onEditFailure() {
-        Toast.makeText(
-            this,
-            resources.getString(R.string.edit_failure),
-            Toast.LENGTH_LONG
-        ).show()
+        runOnUiThread {
+            Toast.makeText(
+                this,
+                resources.getString(R.string.edit_failure),
+                Toast.LENGTH_LONG
+            ).show()
+        }
     }
 
     override fun onInvalidField(kind: InvalidType) {

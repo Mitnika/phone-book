@@ -13,6 +13,7 @@ import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import dimitar.udemy.phonebook.android.R
@@ -23,8 +24,7 @@ import dimitar.udemy.phonebook.models.base.BaseContactModel
 import dimitar.udemy.phonebook.models.base.BasePhoneModel
 import dimitar.udemy.phonebook.models.data.ExternalContactModel
 import dimitar.udemy.phonebook.presenters.AddContactPresenter
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -37,7 +37,7 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     private var binding     : ActivityAddEditContactBinding?    = null
     private var presenter   : AddContactPresenter               = AddContactPresenter(this)
     private var itemAdapter : RecyclerViewAdapterAdd?           = null
-    private val scope                                           = MainScope()
+    private val scope                                           = CoroutineScope(Dispatchers.IO)
 
     private var             imageCapture        : ImageCapture? = null
     private lateinit var    outputDirectory     : File
@@ -56,7 +56,7 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         setContentView(binding?.root)
 
         setUpRV()
-        startCamera()
+
 
         outputDirectory     = getOutputDirectory()
         cameraExecutor      = Executors.newSingleThreadExecutor()
@@ -75,7 +75,9 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         }
     }
 
-    private fun startCamera() {
+    override fun startCamera() {
+        binding?.viewFinder?.preferredImplementationMode = PreviewView.ImplementationMode.TEXTURE_VIEW
+
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
 
         cameraProviderFuture.addListener( {
@@ -133,6 +135,7 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
         binding = null
         presenter.detachView()
         cameraExecutor.shutdown()
+        scope.cancel()
     }
 
     override fun onInvalidField(kind: InvalidType) {
@@ -244,20 +247,24 @@ class AddContactActivity : AppCompatActivity(), AddContactPresenter.View {
     }
 
     override fun onSuccessfulSafeOfContact() {
-        Toast.makeText(
-            applicationContext,
-            "Contact has been saved successfully",
-            Toast.LENGTH_LONG
-        ).show()
-        onBackPressed()
+        runOnUiThread {
+            Toast.makeText(
+                applicationContext,
+                "Contact has been saved successfully",
+                Toast.LENGTH_LONG
+            ).show()
+            onBackPressed()
+        }
     }
 
     override fun onFailedSafeOfContact() {
-        Toast.makeText(
-            this,
-            "Contact has not been saved successfully",
-            Toast.LENGTH_SHORT
-        ).show()
+        runOnUiThread {
+            Toast.makeText(
+                this,
+                "Contact has not been saved successfully",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun setUpRV() {

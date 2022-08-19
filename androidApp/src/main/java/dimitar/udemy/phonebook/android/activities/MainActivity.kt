@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     private var itemAdapter     : RecyclerViewAdapterMain?  = null
     private val presenter       : MainPresenter             = MainPresenter(this, DatabaseDriverFactory(this))
     private var progressDialog  : Dialog?                   = null
-    private val unconfinedScope                             = CoroutineScope(Dispatchers.Unconfined)
+    private val unconfinedScope                             = CoroutineScope(Dispatchers.IO)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -168,15 +168,19 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun showLoadingDialog() {
-        progressDialog = Dialog(this)
-        progressDialog!!.setContentView(DialogProgressBinding.inflate(layoutInflater).root)
-        progressDialog!!.show()
+        runOnUiThread {
+            progressDialog = Dialog(this)
+            progressDialog!!.setContentView(DialogProgressBinding.inflate(layoutInflater).root)
+            progressDialog!!.show()
+        }
 
     }
 
     override fun hideLoadingDialog() {
-        if (progressDialog != null) {
-            progressDialog!!.dismiss()
+        runOnUiThread {
+            if (progressDialog != null) {
+                progressDialog!!.dismiss()
+            }
         }
     }
 

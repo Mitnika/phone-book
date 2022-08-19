@@ -5,7 +5,7 @@ import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.datamanagers.ContactManager
 import dimitar.udemy.phonebook.models.data.ProfileModel
 
-class OverviewContactPresenter(private val view: OverviewContactPresenter.View) {
+class OverviewContactPresenter(private val view: View) {
 
     private val contactsDao : ContactsDao   = ContactsDao()
     private var contact     : ProfileModel? = null

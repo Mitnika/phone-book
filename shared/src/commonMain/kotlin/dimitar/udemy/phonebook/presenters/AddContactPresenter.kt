@@ -61,6 +61,7 @@ class AddContactPresenter(private val view: View) {
     }
 
     fun choosePicture() {
+        view.startCamera()
         view.openDialogToChooseOptionForImage()
     }
 
@@ -82,6 +83,8 @@ class AddContactPresenter(private val view: View) {
     }
 
     interface View {
+        fun startCamera()
+
         fun onInvalidField(kind: InvalidType)
 
         fun openDialogToChooseOptionForImage()
