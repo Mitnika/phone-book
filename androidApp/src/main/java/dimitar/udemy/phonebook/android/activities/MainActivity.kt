@@ -34,7 +34,8 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     private var itemAdapter     : RecyclerViewAdapterMain?  = null
     private val presenter       : MainPresenter             = MainPresenter(this, DatabaseDriverFactory(this))
     private var progressDialog  : Dialog?                   = null
-    private val unconfinedScope                             = CoroutineScope(Dispatchers.IO)
+    private val ioScope                                     = CoroutineScope(Dispatchers.IO)
+    private val mainScope                                   = CoroutineScope(Dispatchers.Main)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +53,8 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     override fun onDestroy() {
         super.onDestroy()
         presenter.detachView()
-        unconfinedScope.cancel()
+        ioScope.cancel()
+        mainScope.cancel()
         binding = null
     }
 
@@ -64,7 +66,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
 
     override fun visualizeContacts(contacts: List<MainContactVisualization>) {
         if (itemAdapter == null) {
-            runOnUiThread {
+            mainScope.launch {
                 setUpRecyclerView(contacts)
                 itemAdapter!!.refresh()
                 setUpSearchView()
@@ -147,18 +149,20 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun showPermissionError() {
-        binding?.permissionNotGranted?.visibility = View.VISIBLE
+        mainScope.launch {
+            binding?.permissionNotGranted?.visibility = View.VISIBLE
+        }
     }
 
     override fun hidePermissionError() {
-        binding?.permissionNotGranted?.visibility = View.GONE
+        mainScope.launch {
+            binding?.permissionNotGranted?.visibility = View.GONE
+        }
     }
 
     override fun loadAddNewContact() {
-
         val intent = Intent(this, AddContactActivity::class.java)
         startActivity(intent)
-
     }
 
     override fun loadOverviewContact(id: Long) {
@@ -168,8 +172,8 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun showLoadingDialog() {
-        runOnUiThread {
-            progressDialog = Dialog(this)
+        mainScope.launch {
+            progressDialog = Dialog(this@MainActivity)
             progressDialog!!.setContentView(DialogProgressBinding.inflate(layoutInflater).root)
             progressDialog!!.show()
         }
@@ -177,7 +181,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun hideLoadingDialog() {
-        runOnUiThread {
+        mainScope.launch {
             if (progressDialog != null) {
                 progressDialog!!.dismiss()
             }
@@ -185,7 +189,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun requestInformation() {
-        unconfinedScope.launch {
+        ioScope.launch {
             kotlin.runCatching {
                 presenter.accessInformation()
             }.onSuccess {
@@ -197,7 +201,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
     }
 
     override fun requestContactsFromPhone() {
-        unconfinedScope.launch {
+        ioScope.launch {
             kotlin.runCatching {
                 presenter.synchronizeDatabases(getContactsFromPhone())
             }.onSuccess {
