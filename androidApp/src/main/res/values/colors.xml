@@ -7,4 +7,5 @@
     <color name="primary_text_color">#363A43</color>
     <color name="divide_color">#EAEAEA</color>
     <color name="task_list_action_color">#F7F6FA</color>
+    <color name="background_color">#03fce3</color>
 </resources>

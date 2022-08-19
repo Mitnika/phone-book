@@ -4,7 +4,6 @@ import android.Manifest
 import android.app.Dialog
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -110,7 +109,7 @@ class MainActivity : AppCompatActivity(), MainPresenter.View {
         FastScrollerBuilder(binding?.rvAllContacts!!)
             .setPopupStyle{
                 it.textSize = 20f
-                it.setBackgroundColor(Color.parseColor("#03fce3"))
+                it.setBackgroundColor(ContextCompat.getColor(applicationContext, R.color.background_color))
             }
             .setThumbDrawable(ContextCompat.getDrawable(this, R.drawable.ic_sideways_arrow)!!)
             .build()
