@@ -1,6 +1,5 @@
 package dimitar.udemy.phonebook.presenters
 
-import dimitar.udemy.phonebook.database.cache.Database
 import dimitar.udemy.phonebook.database.cache.DatabaseDriverFactory
 import dimitar.udemy.phonebook.database.cache.DatabaseProvider
 import dimitar.udemy.phonebook.datamanagers.ContactManager
@@ -15,9 +14,13 @@ import kotlinx.coroutines.withContext
 class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDriverFactory, private val contactRetriever: ContactRetriever) {
 
     private var contacts        : List<ProfileModel>?   = null
-    private val database        : Database              = DatabaseProvider.initializeDatabase(databaseDriverFactory)
-    private val contactManager  : ContactManager        = ContactManagerProvider.getInstance()
+    private val contactManager  : ContactManager
     private var entirely        : Boolean               = true
+
+    init {
+        DatabaseProvider.initializeDatabase(databaseDriverFactory)
+        contactManager = ContactManagerProvider.getInstance()
+    }
 
     fun synchronizeDatabases(contacts: List<ExternalContactModel>) {
         entirely = false
@@ -106,7 +109,7 @@ class MainPresenter(private val view: View, databaseDriverFactory: DatabaseDrive
     }
 
     fun searchForContacts(text: String) : List<MainContactVisualization>{
-        return database.searchByText(text).map(::mapToMainVisualModel)
+        return contactManager.searchByText(text).map(::mapToMainVisualModel)
     }
 
     private suspend fun getContacts() = withContext(Dispatchers.Default) {

@@ -1,5 +1,6 @@
 package dimitar.udemy.phonebook.datamanagers
 
+import dimitar.udemy.phonebook.database.cache.Database
 import dimitar.udemy.phonebook.database.dao.ContactsDao
 import dimitar.udemy.phonebook.database.dao.PhoneNumbersDao
 import dimitar.udemy.phonebook.models.StateConstants
@@ -9,7 +10,8 @@ import dimitar.udemy.phonebook.presenters.MainPresenter
 
 class ContactManager(
     private val contactsDao     : ContactsDao,
-    private val phoneNumbersDao : PhoneNumbersDao
+    private val phoneNumbersDao : PhoneNumbersDao,
+    private val database        : Database
 ) {
     fun syncContacts(contacts: List<ExternalContactModel>) {
         val phoneList   : ArrayList<String> = ArrayList()
@@ -64,5 +66,9 @@ class ContactManager(
 
     fun getAllForDisplay(presenter: MainPresenter) {
         contactsDao.getAllForDisplay(presenter)
+    }
+
+    fun searchByText(text: String): List<ProfileModel> {
+        return database.searchByText(text, contactsDao)
     }
 }

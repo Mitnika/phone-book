@@ -1,5 +1,6 @@
 package dimitar.udemy.phonebook.datamanagers
 
+import dimitar.udemy.phonebook.database.cache.DatabaseProvider
 import dimitar.udemy.phonebook.database.dao.ContactsDaoProvider
 import dimitar.udemy.phonebook.database.dao.PhoneNumbersDaoProvider
 
@@ -9,7 +10,7 @@ object ContactManagerProvider {
 
     fun getInstance(): ContactManager {
         if (contactManager == null) {
-            contactManager = ContactManager(ContactsDaoProvider.getInstance(), PhoneNumbersDaoProvider.getInstance())
+            contactManager = ContactManager(ContactsDaoProvider.getInstance(), PhoneNumbersDaoProvider.getInstance(), DatabaseProvider.getInstance())
         }
         return contactManager!!
     }

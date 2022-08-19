@@ -10,8 +10,8 @@ class Database(databaseDriverFactory: DatabaseDriverFactory) {
     internal val    dbQuery     = database.phonebookDatabaseQueries
 
 
-    internal fun searchByText(text: String): List<ProfileModel> {
-        val people = ContactsDao().getByListOfId(dbQuery.searchForText(text).executeAsList())
+    internal fun searchByText(text: String, contactsDao: ContactsDao): List<ProfileModel> {
+        val people = contactsDao.getByListOfId(dbQuery.searchForText(text).executeAsList())
 
         return people.map { ProfileModel(it, PhoneNumbersDao().getByContactId(it.id)) }
     }
