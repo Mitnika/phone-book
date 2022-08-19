@@ -92,6 +92,8 @@ class EditContactPresenter(private val view: View) {
 
 
     interface View {
+        fun startCamera()
+
         fun getIdExtra()
 
         fun onSuccessfulRetrievalOfInformation()

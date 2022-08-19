@@ -70,7 +70,6 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         cameraExecutor  = Executors.newSingleThreadExecutor()
 
         binding?.civProfilePic?.setOnClickListener {
-            startCamera()
             presenter.changeOfImage()
         }
 
@@ -84,7 +83,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
         }
     }
 
-    private fun startCamera() {
+    override fun startCamera() {
         binding?.viewFinder?.preferredImplementationMode = PreviewView.ImplementationMode.TEXTURE_VIEW
 
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
@@ -274,6 +273,7 @@ class EditContactActivity : AppCompatActivity(), EditContactPresenter.View {
     }
 
     private fun goToCamera() {
+        startCamera()
         binding?.viewFinder?.visibility     = View.VISIBLE
         binding?.cardView?.visibility       = View.GONE
 
